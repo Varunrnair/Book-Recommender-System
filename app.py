@@ -1,18 +1,30 @@
 import streamlit as st
+import numpy as np
 import pandas as pd
 import pickle
 import requests
 
 similarity = pickle.load(open('similarity_scores.pkl','rb')) 
-books = pickle.load(open('books.pkl','rb')) 
-books_df = pd.DataFrame(books)
-
-pt = pickle.load(open('pt.pkl','rb'))
-pt_df = pd.DataFrame(pt)
+books_df = pickle.load(open('books.pkl','rb')) 
+books = pd.DataFrame(books_df)
+pt_df = pickle.load(open('pt.pkl','rb'))
+pt = pd.DataFrame(pt_df)
 
 popular = pickle.load(open('popular.pkl','rb'))
 popular_df = pd.DataFrame(popular)
 
+def recommend(book):
+    name=[]
+    poster=[]
+    author=[]
+    index = np.where(pt.index==book)[0][0]
+    similar_books = sorted(list(enumerate(similarity[index])), key=lambda x: x[1], reverse=True)[1:5]
+    for i in similar_books:
+        temp_df = books[books['Book-Title'] == pt.index[i[0]]]
+        name.append(temp_df.drop_duplicates('Book-Title')['Book-Title'].values[0])
+        poster.append(temp_df.drop_duplicates('Book-Title')['Image-URL-M'].values[0])
+        author.append(temp_df.drop_duplicates('Book-Title')['Book-Author'].values[0])
+    return name, poster, author
 
 st.title('Book Recommender System')
 
@@ -20,8 +32,26 @@ selected_book = st.selectbox(
     'Select a Book',
     popular_df['Book-Title'].values)
 
-
-
+if st.button('Recommend'):
+    name, poster, author = recommend(selected_book)
+    col1,col2 = st.columns(2)
+    st.divider()
+    col3,col4 = st.columns(2)
+    st.divider()
+    for i in range(1):
+        with col1:
+            st.image(poster[0])
+            st.text(name[0])
+        with col2:
+            st.image(poster[1])
+            st.text(name[1])
+    for i in range(1):
+        with col3:
+            st.image(poster[2])
+            st.text(name[2])
+        with col4:
+            st.image(poster[3])
+            st.text(name[3])   
 
 
 st.markdown("<br>", unsafe_allow_html=True)
