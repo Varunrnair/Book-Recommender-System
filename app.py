@@ -2,16 +2,17 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import pickle
-import requests
 
 similarity = pickle.load(open('similarity_scores.pkl','rb')) 
+
 books_df = pickle.load(open('books.pkl','rb')) 
 books = pd.DataFrame(books_df)
+
 pt_df = pickle.load(open('pt.pkl','rb'))
 pt = pd.DataFrame(pt_df)
 
-popular = pickle.load(open('popular.pkl','rb'))
-popular_df = pd.DataFrame(popular)
+popular_df = pickle.load(open('popular.pkl','rb'))
+popular = pd.DataFrame(popular_df)
 
 def recommend(book):
     name=[]
@@ -30,7 +31,7 @@ st.title('Book Recommender System')
 
 selected_book = st.selectbox(
     'Select a Book',
-    popular_df['Book-Title'].values)
+    popular['Book-Title'].values)
 
 if st.button('Recommend'):
     name, poster, author = recommend(selected_book)
@@ -61,16 +62,14 @@ st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown('<h5 style="text-align: center;">Could not find what u were searching for? <br>Here are the books most recommended by avid readers</h5>', unsafe_allow_html=True)
 
-name = popular_df['Book-Title']
-poster = popular_df['Image-URL-M']
+name = popular['Book-Title']
+poster = popular['Image-URL-M']
 
-# Divide the columns into two sets
 col1, col2, col3, col4, col5 = st.columns(5)
 st.divider() 
 col6, col7, col8, col9, col10 = st.columns(5)
 st.divider() 
 
-# Display images and text in the columns
 with col1:
     st.image(poster.iloc[0])
     st.text(name.iloc[0])
